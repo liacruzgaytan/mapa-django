@@ -1,0 +1,23 @@
+
+{% extends 'polls/base.html' %}
+
+{% block title %}Crear Nueva Encuesta{% endblock %}
+
+{% block content %}
+<h2>Crear Nueva Encuesta</h2>
+
+<form method="post">
+  {% csrf_token %}
+  {{ form.as_p }}
+
+  <h3>Opciones</h3>
+  {{ formset.management_form }}
+  {% for form in formset %}
+    {{ form.as_p }}
+  {% endfor %}
+
+  <button type="submit">Crear encuesta</button>
+</form>
+
+<a href="{% url 'polls:index' %}">Volver a la lista de encuestas</a>
+{% endblock %}

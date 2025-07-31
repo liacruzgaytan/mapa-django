@@ -1,0 +1,15 @@
+{% extends 'polls/base.html' %}
+
+{% block title %}Resultados de Encuesta{% endblock %}
+
+{% block content %}
+<h2>Resultados para: {{ question.question_text }}</h2>
+
+<ul>
+  {% for choice in question.choice_set.all %}
+    <li>{{ choice.choice_text }} — {{ choice.votes }} votos</li>
+  {% endfor %}
+</ul>
+
+<a href="{% url 'polls:index' %}">Volver a la lista de encuestas</a>
+{% endblock %}
