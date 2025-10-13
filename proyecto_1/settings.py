@@ -15,9 +15,12 @@ SECRET_KEY = config('SECRET_KEY')
 DEBUG = config('DEBUG', default=False, cast=bool)
 
 # Solo para desarrollo. Desactívalo en producción.
-DEBUG = True
+#DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost').split(',')
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
 
 # Aplicaciones instaladas
 INSTALLED_APPS = [
@@ -115,3 +118,4 @@ DATABASES = {
         'PORT': config('DB_PORT'),
     }
 }
+
