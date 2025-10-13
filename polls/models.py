@@ -1,18 +1,17 @@
 
-# Create your models here.
 from django.db import models
 
-class Question(models.Model):
-    question_text = models.CharField(max_length=200)
-    pub_date = models.DateTimeField("date published")
+class Pregunta(models.Model):
+    texto_pregunta = models.CharField(max_length=200)
+    fecha_publicacion = models.DateTimeField("fecha de publicación")
 
     def __str__(self):
-        return self.question_text
+        return self.texto_pregunta
 
-class Choice(models.Model):
-    question = models.ForeignKey(Question, on_delete=models.CASCADE)
-    choice_text = models.CharField(max_length=200)
-    votes = models.IntegerField(default=0)
+class Opcion(models.Model):
+    pregunta = models.ForeignKey(Pregunta, on_delete=models.CASCADE)
+    texto_opcion = models.CharField(max_length=200)
+    votos = models.IntegerField(default=0)
 
     def __str__(self):
-        return self.choice_text
+        return self.texto_opcion

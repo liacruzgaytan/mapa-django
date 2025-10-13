@@ -3,22 +3,22 @@
 {% block title %}Detalle de Encuesta{% endblock %}
 
 {% block content %}
-<h2>{{ question.question_text }}</h2>
+<h2>{{ pregunta.texto_pregunta }}</h2>
 
-{% if error_message %}
-  <p class="error">{{ error_message }}</p>
+{% if mensaje_error %}
+  <p class="error">{{ mensaje_error }}</p>
 {% endif %}
 
-<form action="{% url 'polls:vote' question.id %}" method="post">
+<form action="{% url 'polls:votar' pregunta.id %}" method="post">
   {% csrf_token %}
-  {% for choice in question.choice_set.all %}
+  {% for opcion in pregunta.opcion_set.all %}
     <div>
-      <input type="radio" name="choice" id="choice{{ forloop.counter }}" value="{{ choice.id }}">
-      <label for="choice{{ forloop.counter }}">{{ choice.choice_text }}</label>
+      <input type="radio" name="opcion" id="opcion{{ forloop.counter }}" value="{{ opcion.id }}">
+      <label for="opcion{{ forloop.counter }}">{{ opcion.texto_opcion }}</label>
     </div>
   {% endfor %}
   <button type="submit">Votar</button>
 </form>
 
-<a href="{% url 'polls:index' %}">Volver a la lista de encuestas</a>
+<a href="{% url 'polls:listado_preguntas' %}">Volver a la lista de encuestas</a>
 {% endblock %}

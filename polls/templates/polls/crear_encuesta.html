@@ -1,4 +1,3 @@
-
 {% extends 'polls/base.html' %}
 
 {% block title %}Crear Nueva Encuesta{% endblock %}
@@ -6,18 +5,24 @@
 {% block content %}
 <h2>Crear Nueva Encuesta</h2>
 
+{% if mensaje_error %}
+  <div class="error">
+    {{ mensaje_error }}
+  </div>
+{% endif %}
+
 <form method="post">
   {% csrf_token %}
-  {{ form.as_p }}
+  {{ formulario.as_p }}
 
   <h3>Opciones</h3>
-  {{ formset.management_form }}
-  {% for form in formset %}
+  {{ formulario_opciones.management_form }}
+  {% for form in formulario_opciones %}
     {{ form.as_p }}
   {% endfor %}
 
   <button type="submit">Crear encuesta</button>
 </form>
 
-<a href="{% url 'polls:index' %}">Volver a la lista de encuestas</a>
+<a href="{% url 'polls:listado_preguntas' %}">Volver a la lista de encuestas</a>
 {% endblock %}

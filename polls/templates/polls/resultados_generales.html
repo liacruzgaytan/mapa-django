@@ -1,0 +1,24 @@
+{% extends 'polls/base.html' %}
+{% block title %}Resultados Completos{% endblock %}
+
+{% block content %}
+<h2>Resultados Generales</h2>
+<p>Total de encuestas: <strong>{{ preguntas|length }}</strong></p>
+
+{% for pregunta in preguntas %}
+  <h3>
+    {{ pregunta.texto_pregunta }}
+    <a href="{% url 'polls:editar_encuesta' pregunta.id %}" class="boton" style="margin-left: 10px;">🛠️ </a>
+  </h3>
+
+  <ul>
+    {% for opcion in pregunta.opcion_set.all %}
+      <li>{{ opcion.texto_opcion }} — {{ opcion.votos }} votos</li>
+    {% endfor %}
+  </ul>
+{% empty %}
+  <p>No hay encuestas registradas.</p>
+{% endfor %}
+
+<a href="{% url 'polls:listado_preguntas' %}">← Volver al listado</a>
+{% endblock %}

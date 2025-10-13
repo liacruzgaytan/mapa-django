@@ -4,42 +4,138 @@
 {% block title %}Mapa de México{% endblock %}
 
 {% block content %}
-  <h2>Mapa de México</h2>
+<h2>Mapa de México</h2>
 
-  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<!-- Estilos de Leaflet -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 
-  <div id="map" style="height: 600px; width: 100%; margin-bottom: 20px;"></div>
+<!-- Estilos personalizados para el panel flotante -->
+<style>
+  .custom-layer-control {
+    background: white;
+    padding: 6px;
+    border-radius: 6px;
+    box-shadow: 0 0 6px rgba(0,0,0,0.3);
+    display: flex;
+    gap: 10px;
+  }
+  .custom-layer-control button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+  }
+  .custom-layer-control img {
+    width: 32px;
+    height: 32px;
+    transition: transform 0.2s;
+  }
+  .custom-layer-control img.active {
+    transform: scale(1.2);
+    border: 2px solid #FFA500;
+    border-radius: 4px;
+  }
+</style>
 
-  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<!-- Contenedor del mapa -->
+<div id="map" style="height: 600px; width: 100%; margin-bottom: 20px;"></div>
 
-  <script>
-    const map = L.map('map').setView([23.6345, -102.5528], 5);
+<!-- Scripts de Leaflet -->
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; OpenStreetMap contributors'
-    }).addTo(map);
+<script>
+  const map = L.map('map').setView([23.6345, -102.5528], 5);
 
-    fetch("{% static 'polls/mexico_estados.geojson' %}")
-      .then(response => response.json())
-      .then(data => {
-        L.geoJSON(data, {
-          style: feature => ({
-            color: "#FF7800",
-            weight: 2,
-            opacity: 0.8,
-            fillOpacity: 0.4,
-            fillColor: "#FFA500"
-          }),
-          onEachFeature: (feature, layer) => {
-            if (feature.properties && feature.properties.name) {
-              layer.bindPopup(`<strong>${feature.properties.name}</strong>`);
-            }
+  // Capas base
+  const calle = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap contributors'
+  });
+
+  const satelite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+    attribution: 'Tiles &copy; Esri'
+  });
+
+  // Grupo para GeoJSON
+  const geojsonGroup = L.layerGroup();
+
+  // Cargar GeoJSON
+  fetch("{% static 'polls/15-Mex.geojson' %}")
+    .then(response => response.json())
+    .then(data => {
+      const geojsonLayer = L.geoJSON(data, {
+        style: feature => ({
+          color: "#FF7800",
+          weight: 2,
+          opacity: 0.8,
+          fillOpacity: 0.4,
+          fillColor: "#FFA500"
+        }),
+        onEachFeature: (feature, layer) => {
+          if (feature.properties && feature.properties.d_codigo) {
+            layer.bindPopup(`<strong>C.P. ${feature.properties.d_codigo}</strong>`);
           }
-        }).addTo(map);
-      })
-      .catch(error => {
-        console.error("Error al cargar el archivo GeoJSON:", error);
-        alert("No se pudo cargar el archivo GeoJSON.");
+        }
       });
-  </script>
+      geojsonGroup.addLayer(geojsonLayer);
+    });
+
+  // Activar capa base por defecto
+  calle.addTo(map);
+
+  // Crear el panel flotante como control Leaflet
+  const LayerControl = L.Control.extend({
+    options: { position: 'bottomleft' },
+    onAdd: function () {
+      const container = L.DomUtil.create('div', 'custom-layer-control');
+
+      container.innerHTML = `
+        <button onclick="toggleLayer('calle')">
+          <img src="{% static 'polls/mapa-de-la-calle.png' %}" title="Calles" />
+        </button>
+        <button onclick="toggleLayer('satelite')">
+          <img src="{% static 'polls/planeta-tierra.png' %}" title="Satélite" />
+        </button>
+        <button onclick="toggleLayer('geojson')">
+          <img src="{% static 'polls/codigo-postal.png' %}" title="Códigos Postales" />
+        </button>
+      `;
+
+      L.DomEvent.disableClickPropagation(container);
+      return container;
+    }
+  });
+
+  map.addControl(new LayerControl());
+
+  // Función para activar/desactivar capas individualmente
+  function toggleLayer(layerName) {
+    const icon = document.querySelector(`.custom-layer-control img[title="${layerName.charAt(0).toUpperCase() + layerName.slice(1)}"]`);
+
+    if (layerName === 'calle') {
+      if (map.hasLayer(calle)) {
+        map.removeLayer(calle);
+        icon.classList.remove('active');
+      } else {
+        map.addLayer(calle);
+        icon.classList.add('active');
+      }
+    } else if (layerName === 'satelite') {
+      if (map.hasLayer(satelite)) {
+        map.removeLayer(satelite);
+        icon.classList.remove('active');
+      } else {
+        map.addLayer(satelite);
+        icon.classList.add('active');
+      }
+    } else if (layerName === 'geojson') {
+      if (map.hasLayer(geojsonGroup)) {
+        map.removeLayer(geojsonGroup);
+        icon.classList.remove('active');
+      } else {
+        map.addLayer(geojsonGroup);
+        icon.classList.add('active');
+      }
+    }
+  }
+</script>
 {% endblock %}

@@ -39,9 +39,11 @@
     <h1>Bienvenida/o a la plataforma de encuestas</h1>
     <p>Selecciona una opción para comenzar:</p>
     <div class="botones">
-        <a href="{% url 'polls:index' %}">Ver Encuestas</a>
+        <a href="{% url 'polls:listado_preguntas' %}">Ver Encuestas</a>
+        <a href="{% url 'polls:resultados_generales' %}">Resultados</a>
         <a href="{% url 'polls:crear_encuesta' %}">Crear Encuesta</a>
         <a href="{% url 'polls:mapa' %}">Ver Mapa</a>
+        <a href="{% url 'polls:descargas' %}">Descargas</a>
     </div>
 </body>
 </html>

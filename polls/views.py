@@ -1,65 +1,106 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.utils import timezone
 from django.views.decorators.http import require_POST
-from django.template import loader
 
-from .models import Question, Choice
-from .forms import QuestionForm, ChoiceFormSet  # asegúrate de definirlos
+from .models import Pregunta, Opcion
+from .forms import FormularioPregunta, FormularioOpciones
 
 def inicio(request):
-    # Página inicial con botones: preguntas, mapa, crear encuesta
+    # Página inicial con botones: encuestas, mapa, crear encuesta, descargas
     return render(request, 'polls/inicio.html')
 
-def index(request):
-    latest_question_list = Question.objects.order_by('-pub_date')[:5]
-    template = loader.get_template('polls/index.html')
-    context = {'latest_question_list': latest_question_list}
-    return HttpResponse(template.render(context, request))
+def listado_preguntas(request):
+    preguntas_recientes = Pregunta.objects.order_by('-fecha_publicacion')[:5]
+    contexto = {'preguntas_recientes': preguntas_recientes}
+    return render(request, 'polls/index.html', contexto)
 
-def detail(request, question_id):
-    question = get_object_or_404(Question, pk=question_id)
-    return render(request, 'polls/detail.html', {'question': question})
+def detalle(request, pregunta_id):
+    pregunta = get_object_or_404(Pregunta, pk=pregunta_id)
+    return render(request, 'polls/detail.html', {'pregunta': pregunta})
 
-def results(request, question_id):
-    question = get_object_or_404(Question, pk=question_id)
-    return render(request, 'polls/results.html', {'question': question})
+def resultados(request, pregunta_id):
+    pregunta = get_object_or_404(Pregunta, pk=pregunta_id)
+    return render(request, 'polls/results.html', {'pregunta': pregunta})
+
+# vista resultados
+def resultados_generales(request):
+    preguntas = Pregunta.objects.all()
+    return render(request, 'polls/resultados_generales.html', {'preguntas': preguntas})
+
 
 @require_POST
-def vote(request, question_id):
-    question = get_object_or_404(Question, pk=question_id)
+def votar(request, pregunta_id):
+    pregunta = get_object_or_404(Pregunta, pk=pregunta_id)
     try:
-        selected_choice = question.choice_set.get(pk=request.POST['choice'])
-    except (KeyError, Choice.DoesNotExist):
+        opcion_seleccionada = pregunta.opcion_set.get(pk=request.POST['opcion'])
+    except (KeyError, Opcion.DoesNotExist):
         return render(request, 'polls/detail.html', {
-            'question': question,
-            'error_message': "No seleccionaste una opción.",
+            'pregunta': pregunta,
+            'mensaje_error': "No seleccionaste una opción.",
         })
     else:
-        selected_choice.votes += 1
-        selected_choice.save()
-        return HttpResponseRedirect(reverse('polls:results', args=(question.id,)))
+        opcion_seleccionada.votos += 1
+        opcion_seleccionada.save()
+        return HttpResponseRedirect(reverse('polls:resultados', args=(pregunta.id,)))
 
 def mapa(request):
-    # Solo renderiza la plantilla mapa.html
     return render(request, 'polls/mapa.html')
 
 def crear_encuesta(request):
-    if request.method == 'POST':
-        form = QuestionForm(request.POST)
-        formset = ChoiceFormSet(request.POST)
-        if form.is_valid() and formset.is_valid():
-            question = form.save(commit=False)
-            question.pub_date = timezone.now()
-            question.save()
-            choices = formset.save(commit=False)
-            for choice in choices:
-                choice.question = question
-                choice.save()
-            return redirect('polls:index')
-    else:
-        form = QuestionForm()
-        formset = ChoiceFormSet()
+    mensaje_error = None
 
-    return render(request, 'polls/crear_encuesta.html', {'form': form, 'formset': formset})
+    if request.method == 'POST':
+        formulario = FormularioPregunta(request.POST)
+        formulario_opciones = FormularioOpciones(request.POST)
+
+        if formulario.is_valid() and formulario_opciones.is_valid():
+            opciones = formulario_opciones.save(commit=False)
+
+            # Validar que al menos una opción tenga texto
+            opciones_validas = [op for op in opciones if op.texto_opcion.strip()]
+            if not opciones_validas:
+                mensaje_error = "⚠️ Debes ingresar al menos una opción de respuesta."
+            else:
+                pregunta = formulario.save(commit=False)
+                pregunta.fecha_publicacion = timezone.now()
+                pregunta.save()
+                for opcion in opciones_validas:
+                    opcion.pregunta = pregunta
+                    opcion.save()
+                return redirect('polls:listado_preguntas')
+        else:
+            mensaje_error = "⚠️ La encuesta no se pudo guardar. Verifica que todos los campos estén completos y sean válidos."
+    else:
+        formulario = FormularioPregunta()
+        formulario_opciones = FormularioOpciones()
+
+    return render(request, 'polls/crear_encuesta.html', {
+        'formulario': formulario,
+        'formulario_opciones': formulario_opciones,
+        'mensaje_error': mensaje_error
+    })
+
+def descargas(request):
+    archivos = [
+        {'nombre': 'Plantilla base.xlsx', 'ruta': 'Plantilla_base.xlsx'},
+        {'nombre': 'Manual.pdf', 'ruta': 'Manual.pdf'},
+    ]
+    return render(request, 'polls/descargas.html', {'archivos': archivos})
+
+#Editar preguntas y opciones
+def editar_encuesta(request, pk):
+    pregunta = get_object_or_404(Pregunta, pk=pk)
+    form_pregunta = FormularioPregunta(request.POST or None, instance=pregunta)
+    form_opciones = FormularioOpciones(request.POST or None, instance=pregunta)
+
+    if form_pregunta.is_valid() and form_opciones.is_valid():
+        form_pregunta.save()
+        form_opciones.save()
+        return redirect('polls:resultados_generales')
+
+    return render(request, 'polls/editar_encuesta.html', {
+        'form_pregunta': form_pregunta,
+        'form_opciones': form_opciones
+    })

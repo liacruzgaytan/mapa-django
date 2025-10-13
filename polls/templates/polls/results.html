@@ -3,13 +3,13 @@
 {% block title %}Resultados de Encuesta{% endblock %}
 
 {% block content %}
-<h2>Resultados para: {{ question.question_text }}</h2>
+<h2>Resultados para: {{ pregunta.texto_pregunta }}</h2>
 
 <ul>
-  {% for choice in question.choice_set.all %}
-    <li>{{ choice.choice_text }} — {{ choice.votes }} votos</li>
+  {% for opcion in pregunta.opcion_set.all %}
+    <li>{{ opcion.texto_opcion }} — {{ opcion.votos }} votos</li>
   {% endfor %}
 </ul>
 
-<a href="{% url 'polls:index' %}">Volver a la lista de encuestas</a>
+<a href="{% url 'polls:listado_preguntas' %}">Volver a la lista de encuestas</a>
 {% endblock %}

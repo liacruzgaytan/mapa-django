@@ -1,16 +1,15 @@
-
 from django import forms
 from django.forms import inlineformset_factory
-from .models import Question, Choice
+from .models import Pregunta, Opcion
 
-class QuestionForm(forms.ModelForm):
+class FormularioPregunta(forms.ModelForm):
     class Meta:
-        model = Question
-        fields = ['question_text']
+        model = Pregunta
+        fields = ['texto_pregunta']
 
-ChoiceFormSet = inlineformset_factory(
-    Question, Choice,
-    fields=['choice_text'],
+FormularioOpciones = inlineformset_factory(
+    Pregunta, Opcion,
+    fields=['texto_opcion'],
     extra=3,  # cuántas opciones mostrar por defecto
     can_delete=False
 )

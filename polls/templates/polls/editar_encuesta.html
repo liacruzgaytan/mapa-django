@@ -1,0 +1,26 @@
+{% extends 'polls/base.html' %}
+{% block title %}Editar Encuesta{% endblock %}
+
+{% block content %}
+<h2>Editar Encuesta</h2>
+
+<form method="post">
+  {% csrf_token %}
+  <fieldset>
+    <legend>Pregunta</legend>
+    {{ form_pregunta.as_p }}
+  </fieldset>
+
+  <fieldset>
+    <legend>Opciones</legend>
+    {{ form_opciones.management_form }}
+    {% for form in form_opciones %}
+      {{ form.as_p }}
+    {% endfor %}
+  </fieldset>
+
+  <button type="submit">Guardar cambios</button>
+</form>
+
+<a href="{% url 'polls:resultados_generales' %}">← Volver a resultados</a>
+{% endblock %}

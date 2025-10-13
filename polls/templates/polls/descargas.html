@@ -1,0 +1,37 @@
+{% extends "polls/base.html" %}
+{% load static %}
+
+{% block title %}Descargas{% endblock %}
+
+{% block content %}
+<h2>Descargas</h2>
+
+<div class="descargas-container">
+    {% for archivo in archivos %}
+        <div class="archivo">
+            <p>{{ archivo.nombre }}</p>
+            <a href="{% static 'polls/'|add:archivo.ruta %}" class="boton" download onclick="handleDownload(event, this)">
+                Descargar {{ archivo.nombre }}
+            </a>
+        </div>
+    {% endfor %}
+</div>
+
+<a href="{% url 'polls:inicio' %}" class="boton">Cerrar</a>
+
+<script>
+function handleDownload(event, link) {
+    fetch(link.href, { method: 'HEAD' })
+        .then(response => {
+            if (!response.ok) {
+                event.preventDefault();
+                alert("No fue posible descargar el archivo. Favor de intentarlo nuevamente más tarde.");
+            }
+        })
+        .catch(() => {
+            event.preventDefault();
+            alert("No fue posible descargar el archivo. Favor de intentarlo nuevamente más tarde.");
+        });
+}
+</script>
+{% endblock %}

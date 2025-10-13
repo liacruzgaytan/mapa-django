@@ -10,9 +10,11 @@
     <header>
         <h1><a href="{% url 'polls:inicio' %}">Mi App de Encuestas</a></h1>
         <nav>
-            <a href="{% url 'polls:index' %}">Ver Encuestas</a> |
-            <a href="{% url 'polls:crear_encuesta' %}">Crear Encuesta</a> |
-            <a href="{% url 'polls:mapa' %}">Mapa</a>
+            <a href="{% url 'polls:listado_preguntas' %}" class="boton">Ver Encuestas</a>
+            <a href="{% url 'polls:resultados_generales' %}">Resultados</a>
+            <a href="{% url 'polls:crear_encuesta' %}" class="boton">Crear Encuesta</a>
+            <a href="{% url 'polls:mapa' %}" class="boton">Ver Mapa</a>
+            <a href="{% url 'polls:descargas' %}" class="boton">Descargas</a>
         </nav>
     </header>
 
@@ -26,4 +28,3 @@
     </footer>
 </body>
 </html>
-
