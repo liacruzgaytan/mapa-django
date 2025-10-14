@@ -31,7 +31,7 @@ INSTALLED_APPS = [
     'polls',  # Tu aplicación personalizada
 ]
 
-# Middlewares
+# Middlewares ultimos 2 para produccion
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -40,6 +40,9 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+
 ]
 
 ROOT_URLCONF = 'proyecto_1.urls'
@@ -130,3 +133,11 @@ DATABASES = {
     }
 }
 
+import dj_database_url
+
+if not DEBUG:
+    DATABASES = {
+        'default': dj_database_url.config(default=config('DATABASE_URL'))
+    }
+
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
