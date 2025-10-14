@@ -5,6 +5,7 @@ Django settings for proyecto_1 project.
 import os
 from pathlib import Path
 from decouple import config
+import dj_database_url
 
 
 # BASE_DIR indica la carpeta raíz del proyecto
@@ -40,7 +41,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
 
 ]
@@ -121,7 +121,8 @@ CSRF_COOKIE_SECURE = True
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-import dj_database_url
+
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 if config('DATABASE_URL', default=None):
     DATABASES = {
