@@ -10,7 +10,7 @@ from decouple import config
 # BASE_DIR indica la carpeta raíz del proyecto
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Clave secreta del proyecto (no la compartas públicamente en producción)
+# Clave secreta del proyecto ()
 SECRET_KEY = config('SECRET_KEY')
 DEBUG = config('DEBUG', default=False, cast=bool)
 
@@ -18,8 +18,6 @@ DEBUG = config('DEBUG', default=False, cast=bool)
 #DEBUG = True
 
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost').split(',')
-
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 
 # Aplicaciones instaladas
@@ -104,6 +102,19 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'polls', 'static'),
 ]
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+# Seguridad para producción
+SECURE_HSTS_SECONDS = 31536000
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
+
+SECURE_SSL_REDIRECT = True
+
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 

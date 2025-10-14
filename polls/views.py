@@ -71,6 +71,12 @@ def crear_encuesta(request):
                     opcion.save()
                 return redirect('polls:listado_preguntas')
         else:
+            # Mostrar errores en consola
+            print("Errores en FormularioPregunta:")
+            print(formulario.errors)
+            print("Errores en FormularioOpciones:")
+            print(formulario_opciones.errors)
+
             mensaje_error = "⚠️ La encuesta no se pudo guardar. Verifica que todos los campos estén completos y sean válidos."
     else:
         formulario = FormularioPregunta()

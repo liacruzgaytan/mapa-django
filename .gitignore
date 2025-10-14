@@ -7,6 +7,7 @@ venv/
 
 # Base de datos local
 db.sqlite3
+post
 
 # Archivos de entorno
 .env
