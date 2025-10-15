@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: proyecto_1
+    env: python
+    plan: free
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn proyecto_1.asgi:application -k uvicorn.workers.UvicornWorker"
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: false
+      - key: ALLOWED_HOSTS
+        value: proyecto1.onrender.com
+      - key: DATABASE_URL
+        fromDatabase:
+          name: proyecto_1_db
+          property: connectionString
+
+databases:
+  - name: proyecto_1_db
+    plan: free
